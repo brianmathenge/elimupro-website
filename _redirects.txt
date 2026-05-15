@@ -1,0 +1,3 @@
+/blog          /blog.html    301
+/blog/*        /post.html?s=:splat  200
+/admin/*       /admin/index.html    200
