@@ -1,35 +1,14 @@
-[build]
-  command = "node build.js"
-  publish = "."
-
-[build.environment]
-  NODE_VERSION = "18"
-
-[[redirects]]
-  from = "/admin/*"
-  to = "/admin/index.html"
-  status = 200
-
 [[redirects]]
   from = "/blog"
-  to = "/blog.html"
+  to = "/news.html"
   status = 301
 
 [[redirects]]
   from = "/blog/*"
-  to = "/post.html?s=:splat"
-  status = 200
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Cache-Control = "public, max-age=3600"
-
-# Custom domain settings
-[[redirects]]
-  from = "https://elimupro.netlify.app/*"
-  to = "https://elimupro.com/:splat"
+  to = "/news.html?s=:splat"
   status = 301
-  force = true
+
+[[redirects]]
+  from = "/news"
+  to = "/news.html"
+  status = 301
