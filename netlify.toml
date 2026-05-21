@@ -26,3 +26,10 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Cache-Control = "public, max-age=3600"
+
+# Custom domain settings
+[[redirects]]
+  from = "https://elimupro.netlify.app/*"
+  to = "https://elimupro.com/:splat"
+  status = 301
+  force = true

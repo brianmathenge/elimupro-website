@@ -1,3 +1,7 @@
+# Domain redirect (remove if not needed)
+https://elimupro.netlify.app/*  https://elimupro.com/:splat  301!
+
+# App redirects
 /blog          /blog.html    301
 /blog/*        /post.html?s=:splat  200
 /admin/*       /admin/index.html    200

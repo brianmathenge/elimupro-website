@@ -5,10 +5,10 @@ backend:
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
 
-site_url: "https://elimupro.netlify.app"
-display_url: "https://elimupro.netlify.app"
-
-logo_url: "https://elimupro.netlify.app/logo.png"
+# UPDATE THESE URLs:
+site_url: "https://elimupro.com"
+display_url: "https://elimupro.com"
+logo_url: "https://elimupro.com/logo.png"
 
 locale: 'en'
 
@@ -52,22 +52,4 @@ collections:
           options: ["draft", "published"],
           default: "draft"
         }
-      - { 
-          label: "Excerpt", 
-          name: "excerpt", 
-          widget: "text",
-          required: false
-        }
       - { label: "Content", name: "body", widget: "markdown" }
-
-  - name: "settings"
-    label: "Site Settings"
-    files:
-      - name: "general"
-        label: "General Settings"
-        file: "content/settings/general.json"
-        fields:
-          - { label: "Site Title", name: "site_title", widget: "string", default: "Elimupro International" }
-          - { label: "Contact Email", name: "contact_email", widget: "string", default: "info@elimupro.com" }
-          - { label: "Phone Number", name: "phone", widget: "string", default: "0777722201" }
-          - { label: "Address", name: "address", widget: "text", default: "Mountain Mall, Thika Super Highway, Nairobi" }
