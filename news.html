@@ -42,6 +42,64 @@
     }
   </script>
   <style>
+  
+  /* ==================== GRAIN TEXTURE ==================== */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  background-repeat: repeat;
+}
+
+/* Ensure header, main, footer appear ABOVE the grain */
+header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
+  position: relative;
+  z-index: 1;
+}
+    
+@media (max-width: 767px) {
+  .mobile-menu {
+    transition: transform 0.3s ease, opacity 0.3s ease, max-height 0.4s ease;
+    transform: translateY(-10px);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .mobile-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+    max-height: 500px;
+    pointer-events: auto;
+  }
+}
+  
+  /* Adjust font sizes for readability */
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  
+  /* Better spacing */
+  .p-8 { padding: 1rem !important; }
+  .py-20 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+  
+  /* Category filter buttons */
+  .flex-wrap.gap-2 {
+    gap: 0.5rem !important;
+  }
+  
+  /* Article cards */
+  .h-48 {
+    height: 180px !important;
+  }
+}
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       vertical-align: middle;
@@ -81,11 +139,15 @@
 <header class="bg-surface/95 backdrop-blur-sm sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm transition-all duration-300" id="main-header">
   <div class="flex justify-between items-center px-5 md:px-8 py-3 w-full max-w-7xl mx-auto">
     <div class="flex items-center gap-3">
+      <!-- MOBILE HAMBURGER MENU BUTTON -->
+      <span class="material-symbols-outlined text-primary text-3xl cursor-pointer md:hidden hover:scale-110 transition-transform" id="mobile-menu-trigger">menu</span>
+      
       <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
         <img src="/images/Logo-removebg-preview.png" alt="ELIMUPRO International Logo" class="h-10 md:h-12 w-auto">
       </a>
     </div>
     
+    <!-- DESKTOP NAVIGATION -->
     <nav class="hidden md:flex items-center gap-8">
       <a href="index.html" class="text-on-surface-variant hover:text-primary font-semibold text-sm">Home</a>
       <a href="index.html#about" class="text-on-surface-variant hover:text-primary font-semibold text-sm">About Us</a>
@@ -98,7 +160,20 @@
       <a href="admin/index.html" class="bg-primary text-on-primary px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all shadow-md hidden sm:inline-block">
         Admin Portal
       </a>
+      <a href="admin/index.html" class="material-symbols-outlined text-primary text-3xl cursor-pointer sm:hidden hover:scale-110 transition-transform">
+        admin_panel_settings
+      </a>
     </div>
+  </div>
+  
+  <!-- MOBILE MENU PANEL -->
+  <div class="mobile-menu md:hidden bg-surface border-t border-outline-variant/20 px-5 py-4 flex flex-col gap-3 absolute w-full left-0 shadow-lg" id="mobile-menu">
+    <a href="index.html" class="text-on-surface-variant font-semibold py-2 pl-3 hover:text-primary">Home</a>
+    <a href="index.html#about" class="text-on-surface-variant font-semibold py-2 pl-3 hover:text-primary">About Us</a>
+    <a href="index.html#projects" class="text-on-surface-variant font-semibold py-2 pl-3 hover:text-primary">Projects</a>
+    <a href="news.html" class="text-primary font-semibold py-2 border-l-4 border-primary pl-3">News & Developments</a>
+    <a href="index.html#contact" class="text-on-surface-variant font-semibold py-2 pl-3 hover:text-primary">Contact</a>
+    <a href="admin/index.html" class="bg-primary text-on-primary px-5 py-2.5 rounded-lg font-semibold text-center mt-2">Admin Portal</a>
   </div>
 </header>
 
@@ -162,7 +237,7 @@
         <li class="text-on-surface-variant">www.elimupro.com</li>
         <li class="text-on-surface-variant">P.O. Box 32814-00600 Nairobi</li>
         <li class="text-on-surface-variant">Nairobi, Kenya</li>
-        <li class="text-on-surface-variant">0777722201 / 0777222099</li>
+        <li class="text-on-surface-variant">+254 777 722 201 / +254 777 222 099</li>
       </ul>
     </div>
   </div>
@@ -341,6 +416,33 @@
   // Load posts on page load
   document.addEventListener('DOMContentLoaded', () => {
     loadNewsPosts();
+  });
+</script>
+
+<script>
+  // Mobile Menu Toggle
+  function setupMobileMenu() {
+    const trigger = document.getElementById('mobile-menu-trigger');
+    const menu = document.getElementById('mobile-menu');
+    if (trigger && menu) {
+      trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        menu.classList.toggle('open');
+        trigger.style.transform = menu.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
+      });
+      document.addEventListener('click', function(event) {
+        if (!menu.contains(event.target) && event.target !== trigger) {
+          menu.classList.remove('open');
+          trigger.style.transform = 'rotate(0deg)';
+        }
+      });
+    }
+  }
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    setupMobileMenu();
+    loadNewsPosts(); // Your existing function
   });
 </script>
 

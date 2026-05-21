@@ -59,6 +59,68 @@
     }
   </script>
   <style>
+  
+ /* ==================== GRAIN TEXTURE ==================== */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  background-repeat: repeat;
+}
+
+/* Ensure header, main, footer appear ABOVE the grain */
+header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
+  position: relative;
+  z-index: 1;
+}
+
+    /* Mobile Responsive Fixes */
+@media (max-width: 640px) {
+  /* Better touch targets */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Stack cards vertically */
+  .grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Full-width tables on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust font sizes for readability */
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  
+  /* Better spacing */
+  .p-8 { padding: 1rem !important; }
+  .py-20 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+  
+  /* Category filter buttons */
+  .flex-wrap.gap-2 {
+    gap: 0.5rem !important;
+  }
+  
+  /* Article cards */
+  .h-48 {
+    height: 180px !important;
+  }
+}
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       vertical-align: middle;
