@@ -391,7 +391,7 @@
         ${post.image ? `
           <img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" 
                class="w-full h-64 md:h-96 object-cover rounded-2xl mb-8 shadow-lg"
-               onerror="this.style.display='none'">
+               onerror="this.style.display='none'; console.log('Image failed to load')"
         ` : ''}
         
         <!-- Article Content -->
