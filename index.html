@@ -573,56 +573,101 @@
     }
   }
 
-  function loadBlogTeaser() {
+function loadBlogTeaser() {
     const teaserGrid = document.getElementById('home-blog-teaser');
     if (!teaserGrid) return;
     
+    // Read from SAME dashboard data as news.html
     let posts = [];
     try {
-      const localData = localStorage.getItem('elimupro_blog_data');
-      if (localData) posts = JSON.parse(localData).posts || [];
-    } catch(e) {}
-    
-    if (posts.length === 0) {
-      fetch('/data/blog-posts.json')
-        .then(res => res.json())
-        .then(data => renderTeaser(data.posts || []))
-        .catch(() => renderTeaser(getDefaultPosts()));
-    } else {
-      renderTeaser(posts);
+      const dashboardData = localStorage.getItem('elimupro_dashboard_data');
+      if (dashboardData) {
+        const parsed = JSON.parse(dashboardData);
+        posts = parsed.posts || [];
+      }
+    } catch(e) {
+      console.log('Error reading dashboard data:', e);
     }
-  }
+    
+    // Fallback to default if no dashboard data
+    if (posts.length === 0) {
+      posts = getDefaultPosts();
+    }
+    
+    renderTeaser(posts);
+}
+  
 
-  function renderTeaser(posts) {
+function renderTeaser(posts) {
     const grid = document.getElementById('home-blog-teaser');
     if (!grid) return;
+    
     const published = posts.filter(p => p.status === 'published').slice(0, 3);
     
     if (published.length === 0) {
-      grid.innerHTML = `<div class="col-span-3 text-center py-8 text-on-surface-variant"><span class="material-symbols-outlined text-4xl mb-3">article</span><p>News and articles coming soon!</p></div>`;
+      grid.innerHTML = `
+        <div class="col-span-3 text-center py-8 text-on-surface-variant">
+          <span class="material-symbols-outlined text-4xl mb-3">article</span>
+          <p>News and articles coming soon!</p>
+        </div>`;
       return;
     }
     
-    grid.innerHTML = published.map(post => `
+        grid.innerHTML = published.map(post => `
       <article class="bg-white rounded-2xl border border-outline-variant/20 overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
-        ${post.image ? `<div class="h-40 overflow-hidden"><img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" class="w-full h-full object-cover" onerror="this.style.display='none'"></div>` : `<div class="h-40 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center"><span class="material-symbols-outlined text-5xl text-primary/40">article</span></div>`}
+        ${post.image ? `
+          <div class="h-40 overflow-hidden">
+            <img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" class="w-full h-full object-cover hover:scale-105 transition duration-500" onerror="this.parentElement.style.display='none'">
+          </div>
+        ` : `
+          <div class="h-40 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-5xl text-primary/40">article</span>
+          </div>
+        `}
         <div class="p-4">
           <span class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full font-medium">${escapeHtml(post.category || 'General')}</span>
           <h3 class="font-heading font-semibold text-on-surface mt-2 mb-1 line-clamp-2">${escapeHtml(post.title)}</h3>
           <p class="text-xs text-on-surface-variant mb-2">${post.date || ''}</p>
-          <a href="news.html?slug=${escapeHtml(post.slug || '')}" class="text-primary text-sm font-semibold hover:underline">Read More →</a>
+          <a href="post.html?slug=${escapeHtml(post.slug || '')}" class="text-primary text-sm font-semibold hover:underline">Read More →</a>
         </div>
       </article>
     `).join('');
-  }
+}
 
   function getDefaultPosts() {
     return [
-      { slug: 'low-access-it-tools-ssa', title: 'Effects of Low Access to Modern Education IT Tools in Sub-Saharan Africa', status: 'published', category: 'Research', date: '2026-05-19', author: 'ELIMUPRO Team', image: '', content: 'In the 21st century, information technology (IT) has become a cornerstone of modern education systems worldwide...' },
-      { slug: 'ai-enhanced-learning', title: 'AI-Enhanced Learning: The Future of African Education', status: 'published', category: 'AI & Technology', date: '2024-12-15', author: 'ELIMUPRO Team' },
-      { slug: 'institutional-capacity', title: 'Building Institutional Capacity Through Digital Training', status: 'published', category: 'Capacity Building', date: '2024-12-10', author: 'ELIMUPRO Team' }
+      {
+        slug: 'low-access-it-tools-ssa',
+        title: 'Effects of Low Access to Modern Education IT Tools in Sub-Saharan Africa',
+        status: 'published',
+        category: 'Research',
+        date: '2026-05-19',
+        author: 'ELIMUPRO Team',
+        image: '',
+        content: '<p>In the 21st century, information technology (IT) has become a cornerstone of modern education systems worldwide...</p>'
+      },
+      {
+        slug: 'ai-enhanced-learning',
+        title: 'AI-Enhanced Learning: The Future of African Education',
+        status: 'published',
+        category: 'AI & Technology',
+        date: '2024-12-15',
+        author: 'ELIMUPRO Team',
+        image: '',
+        content: '<p>Artificial Intelligence is revolutionizing how we approach education...</p>'
+      },
+      {
+        slug: 'institutional-capacity',
+        title: 'Building Institutional Capacity Through Digital Training',
+        status: 'published',
+        category: 'Capacity Building',
+        date: '2024-12-10',
+        author: 'ELIMUPRO Team',
+        image: '',
+        content: '<p>Educational institutions across Africa face a critical challenge...</p>'
+      }
     ];
-  }
+}
 
   function escapeHtml(str) {
     const div = document.createElement('div');
