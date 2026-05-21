@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ELIMUPRO International | Article</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#EE7600",
+            "secondary": "#006d36",
+            "on-surface": "#191c1e",
+            "on-surface-variant": "#564339",
+          },
+          fontFamily: {
+            "body": ["Inter", "sans-serif"],
+            "heading": ["Montserrat", "sans-serif"],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .article-content h2 { font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 0.75rem; color: #191c1e; }
+    .article-content h3 { font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; color: #191c1e; }
+    .article-content p { margin-bottom: 1rem; line-height: 1.8; color: #564339; }
+    .article-content ul, .article-content ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    .article-content li { margin-bottom: 0.5rem; }
+    .article-content strong { color: #EE7600; }
+    .article-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .article-content th, .article-content td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    .article-content th { background: #f5f5f5; font-weight: 600; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-body">
+
+  <header class="bg-white border-b shadow-sm sticky top-0 z-40">
+    <div class="flex justify-between items-center px-6 py-3 max-w-7xl mx-auto">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="/images/Logo-removebg-preview.png" alt="ELIMUPRO" class="h-10 w-auto">
+      </a>
+      <a href="news.html" class="text-primary font-semibold text-sm hover:underline">
+        ← Back to News & Developments
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-5 py-12">
+    <div id="article-content">
+      <div class="animate-pulse space-y-4">
+        <div class="h-8 bg-gray-200 rounded w-3/4"></div>
+        <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+        <div class="h-64 bg-gray-200 rounded-2xl"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function getArticle() {
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get('slug');
+      
+      if (!slug) {
+        window.location.href = 'news.html';
+        return;
+      }
+      
+      // Get from localStorage
+      const data = localStorage.getItem('elimupro_dashboard_data');
+      let posts = [];
+      
+      if (data) {
+        posts = JSON.parse(data).posts || [];
+      } else {
+        // Fallback to default articles
+        posts = [
+          { slug: 'low-access-it-tools-ssa', title: 'Effects of Low Access to Modern Education IT Tools in Sub-Saharan Africa', content: '<p>Full article loading...</p>', category: 'Research', date: '2026-05-19', author: 'ELIMUPRO Team', image: '' },
+          { slug: 'ai-enhanced-learning', title: 'AI-Enhanced Learning: The Future of African Education', content: '<p>AI article...</p>', category: 'AI & Technology', date: '2024-12-15', author: 'ELIMUPRO Team', image: '' }
+        ];
+      }
+      
+      const post = posts.find(p => p.slug === slug && p.status === 'published');
+      
+      if (!post) {
+        document.getElementById('article-content').innerHTML = `
+          <div class="text-center py-16">
+            <span class="text-6xl mb-4 block">📄</span>
+            <h1 class="text-2xl font-bold mb-2">Article Not Found</h1>
+            <a href="news.html" class="text-orange-600 hover:underline">Return to News & Developments</a>
+          </div>`;
+        return;
+      }
+      
+      document.title = post.title + ' | ELIMUPRO International';
+      
+      document.getElementById('article-content').innerHTML = `
+        <article>
+          <span class="inline-block bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-semibold mb-4">${escapeHtml(post.category)}</span>
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${escapeHtml(post.title)}</h1>
+          <div class="flex items-center gap-4 text-sm text-gray-500 mb-8">
+            <span>By ${escapeHtml(post.author)}</span>
+            <span>•</span>
+            <span>${post.date}</span>
+          </div>
+          ${post.image ? `<img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" class="w-full h-64 md:h-96 object-cover rounded-2xl mb-8 shadow-lg">` : ''}
+          <div class="article-content text-lg leading-relaxed">
+            ${post.content}
+          </div>
+        </article>
+      `;
+    }
+    
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+    
+    document.addEventListener('DOMContentLoaded', getArticle);
+  </script>
+</body>
+</html>
