@@ -50,28 +50,15 @@
       </nav>
     </aside>
 
-    <!-- Mobile Nav -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 z-50">
-      <button onclick="switchTab('posts')" class="flex flex-col items-center text-orange-600 text-xs" id="mob-tab-posts">
-        <span class="material-symbols-outlined text-xl">article</span> Articles
-      </button>
-      <button onclick="switchTab('new')" class="flex flex-col items-center text-gray-500 text-xs" id="mob-tab-new">
-        <span class="material-symbols-outlined text-xl">add_circle</span> New
-      </button>
-      <button onclick="switchTab('drafts')" class="flex flex-col items-center text-gray-500 text-xs" id="mob-tab-drafts">
-        <span class="material-symbols-outlined text-xl">draft</span> Drafts
-      </button>
-    </div>
-
     <!-- Main Content -->
     <main class="flex-1 p-4 md:p-8 pb-16 md:pb-8">
       
-      <!-- Tab: All Articles -->
+      <!-- ============ TAB: ALL ARTICLES ============ -->
       <div id="tab-content-posts" class="tab-content">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h2 class="text-xl md:text-2xl font-bold text-gray-800">All Articles</h2>
-          <button onclick="switchTab('new')" class="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-700 flex items-center gap-1">
-            <span class="material-symbols-outlined text-lg">add</span> New Article
+          <button onclick="createNew()" class="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-700">
+            + New Article
           </button>
         </div>
         <div class="bg-white rounded-xl border shadow-sm overflow-x-auto">
@@ -94,13 +81,14 @@
         </div>
       </div>
 
-      <!-- Tab: New/Edit Article -->
+      <!-- ============ TAB: NEW/EDIT ARTICLE ============ -->
       <div id="tab-content-new" class="tab-content hidden">
         <div class="flex items-center gap-4 mb-6">
           <button onclick="switchTab('posts')" class="text-gray-500 hover:text-orange-600">
             <span class="material-symbols-outlined">arrow_back</span>
           </button>
           <h2 class="text-xl md:text-2xl font-bold text-gray-800" id="editor-title">Create New Article</h2>
+          <span id="editing-badge" class="hidden bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">EDITING</span>
         </div>
         
         <div class="grid lg:grid-cols-3 gap-6">
@@ -113,7 +101,6 @@
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Content (HTML) *</label>
               <textarea id="post-content" placeholder="Write your article content here using HTML tags..." class="w-full px-4 py-3 min-h-[300px] border rounded-lg focus:ring-2 focus:ring-orange-200 resize-y font-mono text-sm"></textarea>
-              <p class="text-xs text-gray-400 mt-1">Use HTML tags: &lt;p&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;table&gt;, etc.</p>
             </div>
           </div>
           
@@ -143,13 +130,16 @@
                 <div>
                   <label class="block text-xs font-semibold text-gray-500 mb-1">Image URL</label>
                   <input type="text" id="post-image" placeholder="https://example.com/image.jpg" class="w-full px-3 py-2 border rounded-lg text-sm">
-                  <p class="text-xs text-gray-400 mt-1">Use a direct image URL</p>
                 </div>
-                <button onclick="savePost()" class="w-full bg-orange-600 text-white py-2.5 rounded-lg font-semibold hover:bg-orange-700 flex items-center justify-center gap-2">
-                  <span class="material-symbols-outlined">save</span> <span id="save-btn-text">Publish Article</span>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 mb-1">Slug (auto-generated)</label>
+                  <input type="text" id="post-slug" placeholder="article-slug" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50" readonly>
+                </div>
+                <button onclick="savePost()" class="w-full bg-orange-600 text-white py-2.5 rounded-lg font-semibold hover:bg-orange-700" id="save-btn">
+                  Publish Article
                 </button>
-                <button id="delete-post-btn" onclick="deletePost()" class="w-full border border-red-500 text-red-500 py-2.5 rounded-lg font-semibold hover:bg-red-50 hidden items-center justify-center gap-2">
-                  <span class="material-symbols-outlined">delete</span> Delete Article
+                <button onclick="deletePost()" class="w-full border border-red-500 text-red-500 py-2.5 rounded-lg font-semibold hover:bg-red-50 hidden" id="delete-btn">
+                  Delete Article
                 </button>
               </div>
             </div>
@@ -157,7 +147,7 @@
         </div>
       </div>
 
-      <!-- Tab: Drafts -->
+      <!-- ============ TAB: DRAFTS ============ -->
       <div id="tab-content-drafts" class="tab-content hidden">
         <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">Draft Articles</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="drafts-grid"></div>
@@ -178,9 +168,7 @@
       try {
         const data = localStorage.getItem(STORAGE_KEY);
         if (data) {
-          const parsed = JSON.parse(data);
-          console.log('Loaded data from localStorage:', parsed);
-          return parsed;
+          return JSON.parse(data);
         }
       } catch(e) {
         console.error('Error loading data:', e);
@@ -195,7 +183,7 @@
             id: 1,
             slug: 'low-access-it-tools-ssa',
             title: 'Effects of Low Access to Modern Education IT Tools in Sub-Saharan Africa',
-            content: '<p>In the 21st century, information technology (IT) has become a cornerstone of modern education systems worldwide...</p>',
+            content: '<p>In the 21st century, information technology (IT) has become a cornerstone of modern education systems worldwide. However, many countries in Sub-Saharan Africa (SSA) continue to experience low access to modern education IT tools.</p>',
             status: 'published',
             category: 'Research',
             date: '2026-05-19',
@@ -206,37 +194,26 @@
             id: 2,
             slug: 'ai-enhanced-learning',
             title: 'AI-Enhanced Learning: The Future of African Education',
-            content: '<p>Artificial Intelligence is revolutionizing how we approach education across the African continent...</p>',
+            content: '<p>Artificial Intelligence is revolutionizing how we approach education across the African continent.</p>',
             status: 'published',
             category: 'AI & Technology',
             date: '2024-12-15',
             author: 'ELIMUPRO Team',
             image: ''
-          },
-          {
-            id: 3,
-            slug: 'institutional-capacity',
-            title: 'Building Institutional Capacity Through Digital Training',
-            content: '<p>Educational institutions across Africa face a critical challenge...</p>',
-            status: 'published',
-            category: 'Capacity Building',
-            date: '2024-12-10',
-            author: 'ELIMUPRO Team',
-            image: ''
           }
         ],
-        nextId: 4
+        nextId: 3
       };
     }
     
     function saveData(data) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        console.log('Data saved successfully:', data);
+        console.log('Data saved!', data);
         return true;
       } catch(e) {
-        console.error('Error saving data:', e);
-        alert('Error saving! Please try again.');
+        console.error('Save failed:', e);
+        alert('Error saving! Storage may be full.');
         return false;
       }
     }
@@ -245,6 +222,8 @@
     let currentTab = 'posts';
     let editingId = null;
 
+    console.log('Dashboard loaded with', appData.posts.length, 'posts');
+
     // ==================== TAB SWITCHING ====================
     function switchTab(tab) {
       currentTab = tab;
@@ -252,24 +231,20 @@
       const contentEl = document.getElementById('tab-content-' + tab);
       if (contentEl) contentEl.classList.remove('hidden');
       
-      // Update desktop sidebar
       document.querySelectorAll('#tab-posts, #tab-new, #tab-drafts').forEach(a => a.classList.remove('tab-active'));
       const tabLink = document.getElementById('tab-' + tab);
       if (tabLink) tabLink.classList.add('tab-active');
       
-      // Update mobile nav
-      document.querySelectorAll('[id^="mob-tab-"]').forEach(b => b.classList.remove('text-orange-600'));
-      document.querySelectorAll('[id^="mob-tab-"]').forEach(b => b.classList.add('text-gray-500'));
-      const mobLink = document.getElementById('mob-tab-' + tab);
-      if (mobLink) {
-        mobLink.classList.remove('text-gray-500');
-        mobLink.classList.add('text-orange-600');
-      }
-      
       if (tab === 'posts') renderPostsTable();
       if (tab === 'drafts') renderDrafts();
-      if (tab === 'new') resetEditor();
-      if (tab === 'categories') renderCategories();
+      if (tab === 'new' && !editingId) resetEditor();
+    }
+
+    // ==================== CREATE NEW ====================
+    function createNew() {
+      editingId = null;
+      resetEditor();
+      switchTab('new');
     }
 
     // ==================== RENDER POSTS TABLE ====================
@@ -288,7 +263,6 @@
         <tr class="border-b hover:bg-gray-50">
           <td class="p-3 md:p-4">
             <div class="font-semibold text-gray-800">${escapeHtml(post.title)}</div>
-            <div class="text-xs text-gray-400 mt-1">${post.slug || 'no-slug'}</div>
           </td>
           <td class="p-3 md:p-4 hidden md:table-cell">
             <span class="px-2 py-1 bg-orange-100 text-orange-600 text-xs rounded-full">${escapeHtml(post.category || 'General')}</span>
@@ -298,11 +272,50 @@
           </td>
           <td class="p-3 md:p-4 hidden lg:table-cell text-gray-500">${post.date || ''}</td>
           <td class="p-3 md:p-4 text-right">
-            <button onclick="editPost(${post.id})" class="p-2 hover:bg-orange-50 rounded text-gray-500 hover:text-orange-600" title="Edit">✏️</button>
-            <button onclick="deletePostConfirm(${post.id})" class="p-2 hover:bg-red-50 rounded text-gray-500 hover:text-red-500" title="Delete">🗑️</button>
+            <button onclick="editPost(${post.id})" class="px-3 py-1 bg-orange-50 text-orange-600 rounded hover:bg-orange-100 text-sm mr-1">Edit</button>
+            <button onclick="deletePostConfirm(${post.id})" class="px-3 py-1 bg-red-50 text-red-500 rounded hover:bg-red-100 text-sm">Del</button>
           </td>
         </tr>
       `).join('');
+    }
+
+    // ==================== EDIT POST - THE KEY FIX ====================
+    function editPost(id) {
+      console.log('Editing post with ID:', id);
+      console.log('All posts:', appData.posts);
+      
+      const post = appData.posts.find(p => p.id === id);
+      
+      if (!post) {
+        alert('Error: Article not found! ID: ' + id);
+        console.error('Post not found for ID:', id);
+        return;
+      }
+      
+      console.log('Found post to edit:', post);
+      
+      // Set editing mode
+      editingId = id;
+      
+      // Update UI to show editing mode
+      document.getElementById('editor-title').textContent = 'Edit Article';
+      document.getElementById('editing-badge').classList.remove('hidden');
+      document.getElementById('save-btn').textContent = 'Update Article';
+      document.getElementById('delete-btn').classList.remove('hidden');
+      
+      // FILL IN THE FORM FIELDS - THIS IS THE CRITICAL PART
+      document.getElementById('edit-post-id').value = id;
+      document.getElementById('post-title').value = post.title || '';
+      document.getElementById('post-content').value = post.content || '';
+      document.getElementById('post-status').value = post.status || 'draft';
+      document.getElementById('post-category').value = post.category || 'Research';
+      document.getElementById('post-image').value = post.image || '';
+      document.getElementById('post-slug').value = post.slug || '';
+      
+      console.log('Form fields populated successfully');
+      
+      // Switch to editor tab
+      switchTab('new');
     }
 
     // ==================== SAVE POST ====================
@@ -316,15 +329,11 @@
       if (!title) { alert('Please enter a title'); return; }
       if (!content) { alert('Please enter content'); return; }
       
-      const slug = title.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '')
-        .substring(0, 80);
-      
+      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 80);
       const now = new Date().toISOString().split('T')[0];
       
       if (editingId) {
-        // Update existing post
+        // UPDATE existing post
         const post = appData.posts.find(p => p.id === editingId);
         if (post) {
           post.title = title;
@@ -335,10 +344,13 @@
           post.slug = slug;
           post.date = now;
           console.log('Updated post:', post);
-          alert('Article updated successfully!');
+          alert('Article updated successfully! ✅');
+        } else {
+          alert('Error: Could not find article to update.');
+          return;
         }
       } else {
-        // Create new post
+        // CREATE new post
         const newPost = {
           id: appData.nextId++,
           slug: slug,
@@ -351,47 +363,20 @@
           author: 'ELIMUPRO Team'
         };
         appData.posts.unshift(newPost);
-        console.log('Created new post:', newPost);
-        alert('Article created successfully!');
+        console.log('Created post:', newPost);
+        alert('Article created successfully! ✅');
       }
       
-      // Save to localStorage
-      const saved = saveData(appData);
-      if (!saved) return;
-      
-      // Reset and refresh
+      // Save and refresh
+      saveData(appData);
       resetEditor();
       switchTab('posts');
       updateDraftCount();
     }
 
-    // ==================== EDIT POST ====================
-    function editPost(id) {
-      const post = appData.posts.find(p => p.id === id);
-      if (!post) {
-        alert('Post not found!');
-        return;
-      }
-      
-      console.log('Editing post:', post);
-      
-      editingId = id;
-      document.getElementById('editor-title').textContent = 'Edit Article';
-      document.getElementById('edit-post-id').value = id;
-      document.getElementById('post-title').value = post.title;
-      document.getElementById('post-content').value = post.content || '';
-      document.getElementById('post-status').value = post.status;
-      document.getElementById('post-category').value = post.category || 'Research';
-      document.getElementById('post-image').value = post.image || '';
-      document.getElementById('save-btn-text').textContent = 'Update Article';
-      document.getElementById('delete-post-btn').classList.remove('hidden');
-      
-      switchTab('new');
-    }
-
-    // ==================== DELETE POST ====================
+    // ==================== DELETE ====================
     function deletePostConfirm(id) {
-      if (confirm('Delete this article? This cannot be undone.')) {
+      if (confirm('Delete this article permanently? This cannot be undone.')) {
         appData.posts = appData.posts.filter(p => p.id !== id);
         saveData(appData);
         renderPostsTable();
@@ -412,13 +397,16 @@
     function resetEditor() {
       editingId = null;
       document.getElementById('editor-title').textContent = 'Create New Article';
+      document.getElementById('editing-badge').classList.add('hidden');
       document.getElementById('edit-post-id').value = '';
       document.getElementById('post-title').value = '';
       document.getElementById('post-content').value = '';
       document.getElementById('post-status').value = 'draft';
+      document.getElementById('post-category').value = 'Research';
       document.getElementById('post-image').value = '';
-      document.getElementById('save-btn-text').textContent = 'Publish Article';
-      document.getElementById('delete-post-btn').classList.add('hidden');
+      document.getElementById('post-slug').value = '';
+      document.getElementById('save-btn').textContent = 'Publish Article';
+      document.getElementById('delete-btn').classList.add('hidden');
     }
 
     // ==================== DRAFTS ====================
@@ -448,11 +436,9 @@
       const badge = document.getElementById('draft-count');
       if (badge) {
         badge.textContent = count;
-        badge.classList.toggle('hidden', count === 0);
       }
     }
 
-    // ==================== UTILITIES ====================
     function escapeHtml(str) {
       const div = document.createElement('div');
       div.textContent = str || '';
@@ -460,15 +446,14 @@
     }
 
     function logout() {
-      if (confirm('Are you sure you want to logout?')) {
+      if (confirm('Logout?')) {
         window.location.href = 'index.html';
       }
     }
 
-    // ==================== INITIALIZE ====================
+    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('Dashboard initialized');
-      console.log('Current data:', appData);
+      console.log('Dashboard ready');
       switchTab('posts');
       updateDraftCount();
     });
