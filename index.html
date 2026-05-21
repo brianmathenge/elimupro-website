@@ -500,8 +500,8 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
     </div>
   </section>
 
-  <!-- ==================== CONTACT SECTION ==================== -->
-  <section id="contact" class="py-16 md:py-24">
+<!-- ==================== CONTACT SECTION ==================== -->
+<section id="contact" class="py-16 md:py-24">
     <div class="max-w-7xl mx-auto px-5 md:px-8">
       <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div data-aos="fade-right">
@@ -515,7 +515,7 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
             </div>
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-primary">call</span>
-              <span class="text-on-surface">+254 777 722 201 / +254 777 222 099</span>
+              <span class="text-on-surface">0777722201 / 0777222099</span>
             </div>
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-primary">location_on</span>
@@ -525,18 +525,90 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
         </div>
         <div class="bg-white p-8 rounded-2xl border border-outline-variant/20 shadow-lg" data-aos="fade-left">
           <h3 class="font-heading text-xl mb-4 text-on-surface">Send a Message</h3>
-          <form class="space-y-4" onsubmit="handleContactSubmit(event)">
-            <input type="text" placeholder="Your Name" class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required>
-            <input type="email" placeholder="Your Email" class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required>
-            <textarea placeholder="Your Message" rows="4" class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required></textarea>
-            <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-lg font-semibold hover:bg-primary/90 transition">Send Message</button>
+          
+          <form id="contact-form" class="space-y-4" action="/contact.php" method="POST">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Your Name *</label>
+              <input type="text" name="name" id="contact-name" placeholder="Enter your full name" 
+                     class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Your Email *</label>
+              <input type="email" name="email" id="contact-email" placeholder="Enter your email address" 
+                     class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Your Message *</label>
+              <textarea name="message" id="contact-message" rows="4" placeholder="How can we help you?" 
+                        class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required></textarea>
+            </div>
+            
+            <!-- reCAPTCHA Enterprise Button -->
+            <button class="g-recaptcha w-full bg-primary text-on-primary py-3 rounded-lg font-semibold hover:bg-primary/90 transition flex items-center justify-center gap-2"
+                    data-sitekey="6Le8zVgrAAAAAKpB4NgzD9wTT6ht7ZaJz22Gfm-a" 
+                    data-callback='onContactSubmit' 
+                    data-action='submit'>
+              <span class="material-symbols-outlined">send</span> Send Message
+            </button>
+            
+            <div id="form-status" class="text-center text-sm hidden"></div>
           </form>
         </div>
       </div>
     </div>
   </section>
-
-</main>
+  
+  <!-- reCAPTCHA Enterprise Script -->
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6Le8zVgrAAAAAKpB4NgzD9wTT6ht7ZaJz22Gfm-a"></script>
+  <script>
+    function onContactSubmit(token) {
+      const form = document.getElementById('contact-form');
+      const statusDiv = document.getElementById('form-status');
+      
+      // Validate form fields
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      const message = document.getElementById('contact-message').value.trim();
+      
+      if (!name || !email || !message) {
+        statusDiv.className = 'text-center text-sm text-red-600 mt-2';
+        statusDiv.textContent = '❌ Please fill in all required fields.';
+        statusDiv.classList.remove('hidden');
+        return;
+      }
+      
+      // Show loading
+      statusDiv.className = 'text-center text-sm text-blue-600 mt-2';
+      statusDiv.textContent = '⏳ Sending your message...';
+      statusDiv.classList.remove('hidden');
+      
+      // Submit the form
+      const formData = new FormData(form);
+      formData.append('g-recaptcha-response', token);
+      
+      fetch('/contact.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          statusDiv.className = 'text-center text-sm text-green-600 mt-2';
+          statusDiv.textContent = '✅ ' + data.message;
+          form.reset();
+        } else {
+          statusDiv.className = 'text-center text-sm text-red-600 mt-2';
+          statusDiv.textContent = '❌ ' + data.message;
+        }
+        statusDiv.classList.remove('hidden');
+      })
+      .catch(error => {
+        statusDiv.className = 'text-center text-sm text-red-600 mt-2';
+        statusDiv.textContent = '❌ Network error. Please try again.';
+        statusDiv.classList.remove('hidden');
+      });
+    }
+  </script>
 
 <!-- ==================== FOOTER ==================== -->
 <footer class="bg-surface-container-low border-t border-outline-variant/30 mt-auto">
@@ -616,11 +688,58 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
     }
   }
 
-  function handleContactSubmit(e) {
+function handleContactSubmit(e) {
     e.preventDefault();
-    alert('Message sent successfully! We\'ll get back to you soon.');
-    e.target.reset();
-  }
+    
+    const form = document.getElementById('contact-form');
+    const statusDiv = document.getElementById('form-status');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Check if reCAPTCHA is completed
+    const recaptchaResponse = grecaptcha.getResponse();
+    if (!recaptchaResponse) {
+        statusDiv.className = 'text-center text-sm text-red-600 mt-2';
+        statusDiv.textContent = 'Please complete the reCAPTCHA verification.';
+        statusDiv.classList.remove('hidden');
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Sending...';
+    statusDiv.classList.add('hidden');
+    
+    // Prepare form data
+    const formData = new FormData(form);
+    
+    // Send to PHP handler
+    fetch('/contact.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            statusDiv.className = 'text-center text-sm text-green-600 mt-2';
+            statusDiv.textContent = '✅ ' + data.message;
+            form.reset();
+            grecaptcha.reset();
+        } else {
+            statusDiv.className = 'text-center text-sm text-red-600 mt-2';
+            statusDiv.textContent = '❌ ' + data.message;
+        }
+        statusDiv.classList.remove('hidden');
+    })
+    .catch(error => {
+        statusDiv.className = 'text-center text-sm text-red-600 mt-2';
+        statusDiv.textContent = '❌ Network error. Please try again.';
+        statusDiv.classList.remove('hidden');
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined">send</span> Send Message';
+    });
+}
 
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
