@@ -515,7 +515,7 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
             </div>
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-primary">call</span>
-              <span class="text-on-surface">0777722201 / 0777222099</span>
+              <span class="text-on-surface">+254 777 722 201 / +254 777 222 099</span>
             </div>
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-primary">location_on</span>
@@ -526,6 +526,7 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
         <div class="bg-white p-8 rounded-2xl border border-outline-variant/20 shadow-lg" data-aos="fade-left">
           <h3 class="font-heading text-xl mb-4 text-on-surface">Send a Message</h3>
           
+          <!-- Contact Form with reCAPTCHA Enterprise -->
           <form id="contact-form" class="space-y-4" action="/contact.php" method="POST">
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Your Name *</label>
@@ -543,11 +544,12 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
                         class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary" required></textarea>
             </div>
             
-            <!-- reCAPTCHA Enterprise Button -->
-            <button class="g-recaptcha w-full bg-primary text-on-primary py-3 rounded-lg font-semibold hover:bg-primary/90 transition flex items-center justify-center gap-2"
-                    data-sitekey="6Le8zVgrAAAAAKpB4NgzD9wTT6ht7ZaJz22Gfm-a" 
-                    data-callback='onContactSubmit' 
-                    data-action='submit'>
+            <!-- reCAPTCHA Enterprise Widget -->
+            <div class="flex justify-center">
+              <div class="g-recaptcha" data-sitekey="6Le8zVgrAAAAAKpB4NgzD9wTT6ht7ZaJz22Gfm-a" data-action="SUBMIT"></div>
+            </div>
+            
+            <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-lg font-semibold hover:bg-primary/90 transition flex items-center justify-center gap-2">
               <span class="material-symbols-outlined">send</span> Send Message
             </button>
             
@@ -558,21 +560,27 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
     </div>
   </section>
   
-  <!-- reCAPTCHA Enterprise Script -->
-  <script src="https://www.google.com/recaptcha/enterprise.js?render=6Le8zVgrAAAAAKpB4NgzD9wTT6ht7ZaJz22Gfm-a"></script>
+  <!-- reCAPTCHA Enterprise JavaScript -->
+  <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
+  
+
   <script>
-    function onContactSubmit(token) {
-      const form = document.getElementById('contact-form');
+    // Handle contact form submission
+document.addEventListener('DOMContentLoaded', function() {
+  const contactForm = document.getElementById('contact-form');
+  
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
       const statusDiv = document.getElementById('form-status');
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      const recaptchaResponse = grecaptcha.getResponse();
       
-      // Validate form fields
-      const name = document.getElementById('contact-name').value.trim();
-      const email = document.getElementById('contact-email').value.trim();
-      const message = document.getElementById('contact-message').value.trim();
-      
-      if (!name || !email || !message) {
+      // Check if reCAPTCHA is completed
+      if (!recaptchaResponse) {
         statusDiv.className = 'text-center text-sm text-red-600 mt-2';
-        statusDiv.textContent = '❌ Please fill in all required fields.';
+        statusDiv.textContent = '❌ Please complete the reCAPTCHA verification.';
         statusDiv.classList.remove('hidden');
         return;
       }
@@ -581,11 +589,12 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
       statusDiv.className = 'text-center text-sm text-blue-600 mt-2';
       statusDiv.textContent = '⏳ Sending your message...';
       statusDiv.classList.remove('hidden');
+      submitBtn.disabled = true;
       
-      // Submit the form
-      const formData = new FormData(form);
-      formData.append('g-recaptcha-response', token);
+      // Prepare form data
+      const formData = new FormData(contactForm);
       
+      // Send to PHP
       fetch('/contact.php', {
         method: 'POST',
         body: formData
@@ -595,19 +604,26 @@ header, main, footer, .floating-btn, .fixed, nav, [class*="z-"] {
         if (data.success) {
           statusDiv.className = 'text-center text-sm text-green-600 mt-2';
           statusDiv.textContent = '✅ ' + data.message;
-          form.reset();
+          contactForm.reset();
+          grecaptcha.reset(); // Reset reCAPTCHA
         } else {
           statusDiv.className = 'text-center text-sm text-red-600 mt-2';
           statusDiv.textContent = '❌ ' + data.message;
+          grecaptcha.reset();
         }
         statusDiv.classList.remove('hidden');
       })
       .catch(error => {
         statusDiv.className = 'text-center text-sm text-red-600 mt-2';
-        statusDiv.textContent = '❌ Network error. Please try again.';
+        statusDiv.textContent = '❌ Network error. Please try again later.';
         statusDiv.classList.remove('hidden');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
       });
-    }
+    });
+  }
+});
   </script>
 
 <!-- ==================== FOOTER ==================== -->
